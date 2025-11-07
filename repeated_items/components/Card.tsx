@@ -16,7 +16,6 @@ import {
   translateY,
 } from '../../module/functions/cardsAnimation';
 import { CardsPlacesType } from './room/PlayerCards';
-import ChooseColors from '../../module/utils';
 import Display from '../constants/Display';
 
 export default function CardC({
@@ -168,19 +167,7 @@ export default function CardC({
               : imageBasicStyle.size,
           ]}
         >
-          <View
-            style={
-              cardChooseColor
-                ? [
-                    cardStyles.cardChooseColor,
-                    {
-                      backgroundColor:
-                        ChooseColors[cardChooseColor.id as 1 | 2],
-                    },
-                  ]
-                : undefined
-            }
-          />
+          <View style={{}} />
         </ImageBackground>
       </TouchableOpacity>
     </Animated.View>
