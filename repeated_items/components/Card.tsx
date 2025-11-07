@@ -6,19 +6,18 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, { useEffect, useMemo, useRef } from 'react';
-import { PlayersObjectType, PlayerType } from '../../types';
-import { Card } from '../../types';
+import React, { useEffect, useRef } from 'react';
+import { PlayersObjectType, PlayerType, Card } from '../types';
 import {
   distanceAmongCards,
   playCardAnimation,
   playedCardBottomAnimation,
   rotateCards,
   translateY,
-} from '../../../functions/cardsAnimation';
-import { CardsPlacesType } from './PlayerCards';
-import Display from '../../constants/Display';
-import ChooseColors from '../../../module/utils';
+} from '../../module/functions/cardsAnimation';
+import { CardsPlacesType } from './room/PlayerCards';
+import ChooseColors from '../../module/utils';
+import Display from '../constants/Display';
 
 export default function CardC({
   playCard,

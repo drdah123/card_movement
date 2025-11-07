@@ -1,7 +1,14 @@
 {
-  "name": "animation-fix-2",
+  "name": "card-movement",
   "version": "1.0.0",
   "main": "index.ts",
+  "exports": {
+    ".": "./external.ts",
+    "./module": "./module/index.ts",
+    "./components": "./module/components/index.ts",
+    "./functions": "./module/functions/index.ts",
+    "./utils": "./module/utils/index.ts"
+  },
   "scripts": {
     "start": "npx expo start",
     "android": "expo run:android",

@@ -19,4 +19,6 @@ export function isMshroaFull({
   if (mshroa === 20 && cards.length >= 5) return true;
   return false;
 }
+
+export { ChooseColors };
 export default ChooseColors;

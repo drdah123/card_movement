@@ -1,19 +1,16 @@
 import { ImageBackground, StyleSheet } from 'react-native';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
-import { Card, PlayersObjectType, PlayerType } from '../types';
-import PlayerCards from './room/PlayerCards';
+import { Card, PlayersIDs, PlayersObjectType } from '../types';
+import PlayerCards from '../../repeated_items/components/room/PlayerCards';
 
 import PlayerName from './room/PlayerName';
 import RoomFooter from './room/RoomFooter';
 import { CardName, initialPlayersState } from '../cards';
-import SendMshariaButtons from '../../module/components/SendMshariaButtons';
-import { MshariaPowerType, PlayersIDs } from '../types';
 import Display from '../constants/Display';
 import Colors from '../constants/Colors';
 import Images from '../constants/Images';
 import backgroundsImages from '../constants/backgroundsImages';
-import { isMshroaFull } from '../../module/utils';
 
 const styles = StyleSheet.create({
   container: {
@@ -26,148 +23,30 @@ export default function Room() {
   // State hooks first
   const [isTest, setIsTest] = useState(true);
   const [playerTurn, setPlayerTurn] = useState(0);
-  const [playingTurnNum, setPlayingTurnNum] = useState(0);
   const [players, setPlayers] = useState<PlayersObjectType>(
     initialPlayersState()
   );
-  console.log(
-    `🚀 ~ Room ~ players.fourthPlayer.manualMsharia:`,
-    players.fourthPlayer.manualMsharia
-  );
-  console.log('________________________________________________');
-  // console.log(
-  //   `🚀 ~ Room ~ players.fourthPlayer.sendMsharia:`,
-  //   players.fourthPlayer.sendMsharia
-  // );
-  // Compute room from params
   const [isMshariaOpen, setIsMshariaOpen] = useState(false);
   const [waitingTime, setWaitingTime] = useState(false);
 
   // !the start add to repeated items
-  const [isManualMsharia, setIsManualMsharia] = useState(false);
-  const [currentMshroa, setCurrentMshroa] = useState<
-    { mshroaPower: MshariaPowerType; id: number } | undefined
-  >(undefined);
+
   // ! the end of add to repeated items
 
-  const sendMshariaHandler = useCallback(
-    (key: PlayersIDs, mshroa: MshariaPowerType) => {
-      setPlayers((prv) => {
-        if (!prv) return prv;
-        const sameMsharia = prv[key].sendMsharia.filter(
-          (msh) => msh === mshroa
-        ).length;
-        if (sameMsharia === 2) {
-          prv[key].sendMsharia = [];
-          // ! add to repeated items
-          if (isManualMsharia) {
-            prv[key].manualMsharia = [];
-            setCurrentMshroa(undefined);
-          }
-        } else {
-          prv[key].sendMsharia =
-            prv[key].sendMsharia.length >= 2
-              ? [
-                  ...prv[key].sendMsharia.filter(
-                    (item, i) => i !== 0 && item !== 40
-                  ),
-                  mshroa,
-                ]
-              : [...prv[key].sendMsharia, mshroa];
-          // ! add to repeated items
-          if (isManualMsharia) {
-            if (prv[key].manualMsharia.length === 0) {
-              prv[key].manualMsharia = [
-                {
-                  id: 1,
-                  MshariaPowerType: mshroa,
-                  cards: [],
-                },
-                ...prv[key].manualMsharia,
-              ];
-              setCurrentMshroa({
-                mshroaPower: mshroa,
-                id: 1,
-              });
-            } else {
-              prv[key].manualMsharia = [
-                {
-                  id: prv[key].manualMsharia.length + 1,
-                  MshariaPowerType: mshroa,
-                  cards: [],
-                },
-                ...prv[key].manualMsharia,
-              ];
-              setCurrentMshroa({
-                mshroaPower: mshroa,
-                id: prv[key].manualMsharia.length + 1,
-              });
+  function playCard(card: Card, playerId: PlayersIDs) {
+    setPlayers((prv) => {
+      if (!prv) return prv;
+      prv[playerId].cards = prv[playerId].cards.map((item) =>
+        item.name === card.name
+          ? {
+              ...item,
+              isPlayed: { is: true, playingTurnNum: 1, isGroundCard: true },
             }
-          }
-        }
-
-        return { ...prv };
-      });
-    },
-    // ! add to repeated items
-    [isManualMsharia]
-  );
-  // ! add to repeated items
-
-  // ! add to repeated items
-  const setMshroaCardsHandler = useCallback(
-    (player: PlayerType, card: CardName) => {
-      if (
-        !player ||
-        !player.manualMsharia ||
-        !isManualMsharia ||
-        player.manualMsharia.length === 0
-      )
-        return undefined;
-
-      setPlayers((prev) => {
-        if (!prev) return prev;
-        const playerMshariaIndex = prev[player.id].manualMsharia.findIndex(
-          (msh) => msh.id === currentMshroa?.id
-        );
-        if (playerMshariaIndex === -1) return prev;
-        const hasSameCard = prev[player.id].manualMsharia[
-          playerMshariaIndex
-        ].cards.findIndex((c) => c === card);
-        // add card
-        if (hasSameCard === -1) {
-          prev[player.id].manualMsharia[playerMshariaIndex].cards = [
-            ...prev[player.id].manualMsharia[playerMshariaIndex].cards,
-            card,
-          ];
-        } else {
-          // remove card
-          prev[player.id].manualMsharia[playerMshariaIndex].cards = prev[
-            player.id
-          ].manualMsharia[playerMshariaIndex].cards.filter((c) => c !== card);
-        }
-        const index = prev[player.id].manualMsharia.findIndex(
-          (msh) => msh.id === currentMshroa?.id
-        );
-        console.log(`🚀 ~ Room ~ index:`, index);
-        if (
-          isMshroaFull({
-            mshroa: prev[player.id].manualMsharia[index].MshariaPowerType,
-            cards: prev[player.id].manualMsharia[index].cards,
-          })
-        )
-          setCurrentMshroa({
-            mshroaPower:
-              prev[player.id].manualMsharia[index === 1 ? 0 : 1]
-                .MshariaPowerType,
-            id: prev[player.id].manualMsharia[index === 1 ? 0 : 1].id,
-          });
-
-        return { ...prev };
-      });
-    },
-    [players, isManualMsharia, currentMshroa]
-  );
+          : item
+      );
+      return { ...prv };
+    });
+  }
 
   return (
     <ImageBackground
@@ -249,61 +128,13 @@ export default function Room() {
           isTest={isTest}
           distributor={false}
         />
-        <SendMshariaButtons
-          waitingTime={waitingTime}
-          player={players.firstPlayer}
-          position="right"
-          sendMshariaHandler={sendMshariaHandler}
-          isMshariaOpen={isMshariaOpen}
-          setIsManualMsharia={setIsManualMsharia}
-          isManualMsharia={isManualMsharia}
-          setPlayers={setPlayers}
-          currentMshroa={currentMshroa}
-          setCurrentMshroa={setCurrentMshroa}
-        />
-        <SendMshariaButtons
-          waitingTime={waitingTime}
-          player={players.secondPlayer}
-          position="right"
-          sendMshariaHandler={sendMshariaHandler}
-          isMshariaOpen={isMshariaOpen}
-          setIsManualMsharia={setIsManualMsharia}
-          isManualMsharia={isManualMsharia}
-          setPlayers={setPlayers}
-          currentMshroa={currentMshroa}
-          setCurrentMshroa={setCurrentMshroa}
-        />
-        <SendMshariaButtons
-          waitingTime={waitingTime}
-          player={players.thirdPlayer}
-          position="top"
-          sendMshariaHandler={sendMshariaHandler}
-          isMshariaOpen={isMshariaOpen}
-          setIsManualMsharia={setIsManualMsharia}
-          isManualMsharia={isManualMsharia}
-          setPlayers={setPlayers}
-          currentMshroa={currentMshroa}
-          setCurrentMshroa={setCurrentMshroa}
-        />
-        <SendMshariaButtons
-          waitingTime={waitingTime}
-          player={players.fourthPlayer}
-          position="bottom"
-          sendMshariaHandler={sendMshariaHandler}
-          isMshariaOpen={isMshariaOpen}
-          setIsManualMsharia={setIsManualMsharia}
-          isManualMsharia={isManualMsharia}
-          setPlayers={setPlayers}
-          currentMshroa={currentMshroa}
-          setCurrentMshroa={setCurrentMshroa}
-        />
         <>
           <PlayerCards
             player={players.firstPlayer}
             playerTurn={playerTurn}
             playerId={players.firstPlayer.name}
             position="right"
-            playCard={() => {}}
+            playCard={playCard}
             isTest={isTest}
           />
           <PlayerCards
@@ -311,7 +142,7 @@ export default function Room() {
             playerTurn={playerTurn}
             playerId={players.secondPlayer.name}
             position="left"
-            playCard={() => {}}
+            playCard={playCard}
             isTest={isTest}
           />
           <PlayerCards
@@ -319,7 +150,7 @@ export default function Room() {
             playerTurn={playerTurn}
             playerId={players.thirdPlayer.name}
             position="top"
-            playCard={() => {}}
+            playCard={playCard}
             isTest={isTest}
           />
           <PlayerCards
@@ -327,13 +158,7 @@ export default function Room() {
             playerTurn={playerTurn}
             playerId={players.fourthPlayer.name}
             position="bottom"
-            playCard={(card) => {
-              // ! the problem might be here
-              setMshroaCardsHandler(
-                players.fourthPlayer,
-                card.name as CardName
-              );
-            }}
+            playCard={playCard}
             isTest={isTest}
           />
         </>

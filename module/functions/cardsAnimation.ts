@@ -1,6 +1,6 @@
-import Display from '../repeated_items/constants/Display';
+import Display from '../../repeated_items/constants/Display';
 import { Animated } from 'react-native';
-import { CardsPlacesType, PlayerType } from '../repeated_items/types';
+import { CardsPlacesType, PlayerType } from '../../repeated_items/types';
 
 function curveCards({
   i,

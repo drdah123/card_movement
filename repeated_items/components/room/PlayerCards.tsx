@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import { PlayersObjectType, PlayerType } from '../../types';
 import { Card } from '../../types';
-import CardC from './Card';
+import CardC from '../Card';
 import Animated, {
   Easing,
   useAnimatedStyle,
