@@ -4,7 +4,6 @@
  */
 
 // Components
-export { Card, PlayerCards } from './module/components';
 
 // Functions - Animation
 export {
