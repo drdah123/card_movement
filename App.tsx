@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Room from './repeated_items/components/Room';
-import Colors from '../repeated_items/constants/Colors';
+import Colors from './repeated_items/constants/Colors';
 
 export default function App() {
   return (
